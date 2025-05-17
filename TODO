@@ -1,0 +1,71 @@
+(OLD) tag means the bug existed in the 1.20.4 version even before I ported it,
+      (and maybe even earlier) and also these are unlikely to be fixed by me.
+
+Negative directions shrink to crawl upon head hitting
+[HIGH PRIORITY] (OLD)
+
+Monster AI does not work in altered gravity
+[VERY, VERY LOW PRIORITY] (OLD)
+https://github.com/Fusion-Flux/Gravity-Api/issues/23
+
+Visual Bugs:
+
+Gravity Switch Animation for player model rotates around the feet instead of the center of the player
+[MEDIUM PRIORITY] (OLD)
+
+Model is shifted downwards when sneaking
+[MEDIUM PRIORITY] (OLD)
+    -may also solve: https://github.com/Fusion-Flux/Gravity-Api/issues/63
+
+Walk/Sprint Animations don't play along vertical axis
+[MEDIUM PRIORITY] (OLD)
+https://github.com/qouteall/GravityChanger/issues/13
+
+Missing Features:
+
+Better Timed Gravity
+    -Starminer had gravity pads change your gravity for a small time frame,
+     which made jumping and the like on them possible and in general just felt better,
+     Would be better built-in than something like a potion effect.
+[LOW PRIORITY]
+
+Toggleable gravity
+[LOW PRIORITY]
+https://github.com/qouteall/GravityChanger/issues/32
+
+Expansion on the above 2: Conditional Gravity,
+    -For effects like gravity changed only when sprinting, like those triangle blocks from mario world,
+     this could be set up so timed gravity is a condition and may also allow for toggleing gravity
+     if there was a base condition, might also be helpful to consider gravity priorities here
+[VERY LOW PRIORITY]
+
+Bubble column drag direction effected by gravity
+[LOW PRIORITY]
+https://github.com/qouteall/GravityChanger/issues/24
+
+Falling Sand Falling, Placement and Stability in alternate gravity directions
+[LOW PRIORITY]
+
+"Zero" Gravity Zones + Falling blocks instantly place + Gravity Blocks don't fall in them
+    -still need a gravity direction, but expansion on zero gravity
+     would be nice for space mods and the like akin to starminer
+[LOW PRIORITY]
+
+Dimension gravity
+[VERY LOW PRIORITY]
+https://github.com/qouteall/GravityChanger/issues/14
+
+Compat. with camera altering mods (Shoulder Surfing, etc)
+[VERY LOW PRIORITY]
+https://github.com/qouteall/GravityChanger/issues/37
+https://github.com/qouteall/GravityChanger/issues/31
+
+Better stair and slab placement when rotated
+(probably requires vertical slabs and new stair rotations)
+(slabs could use trapdoor rotation logic maybe?)
+[VERY LOW PRIORITY]
+
+Slight item pickup range alterations based on gravity
+    -Have not tested so I don't know how important this is
+[NEEDS TESTING]
+https://github.com/Fusion-Flux/Gravity-Api/issues/66

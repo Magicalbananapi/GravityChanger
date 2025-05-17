@@ -1,7 +1,40 @@
 # GravityChanger
 
-This is a fork of FusionFlux's [Gravity API](https://github.com/Fusion-Flux/Gravity-Api) for Fabric.
-Gravity API is originally a fork of Gaider10's [Gravity Changer](https://github.com/Gaider10/GravityChanger).
+NOTICE: I am extremely unlikely to maintain this fork, so if anyone else wants
+feel free to do so, if I ever come back I'll probably be working off the most 
+up-to-date version of the mod anyway.
+
+Normally I would have just submitted this as a pull req on the GitHub for qouteall's
+fork, but I wanted to use the yarn mapping to port this since I was more used to
+using it and with this version using a different mapping I felt like it made
+more sense as a fork than sending a pull req with literally every single file significantly
+changed.
+
+If anyone wants to convert it back to mojmap+parchment mappings and submit it to
+qouteall's GitHub, feel free, but the mixins will probably be annoying, so they will
+probably all have to be replaced anyway.
+
+Regardless, this fork is close enough to qouteall's fork that this can be considered the same
+thing, so the below information has mostly not changed except for adding some history to the fork notice
+since there was a lot more to it.
+
+#
+This is a fork of qouteall's [Gravity Changer](https://github.com/qouteall/GravityChanger).
+
+Which is a fork of FusionFlux's [Gravity API](https://github.com/Fusion-Flux/Gravity-Api) for Fabric.
+
+Gravity API was partially a fork of Gaider10's [Gravity Changer](https://github.com/Gaider10/GravityChanger)
+(Some code was also adapted from forge from the below two mods, mods like pehkui,
+written from scratch, or adapted from things like the Dinnerbone code).
+
+The 1.12+ generation of gravity mods seem to be partially based on code from Mysteryem's [Up and Down and All Around](https://github.com/Mysteryem/Up_And_Down_And_All_Around).
+
+As far as I know, most gravity mods past 1.7.10 are attempts to recreate the gravity effect
+from what I consider the original gravity mod, [StarMiner](https://web.archive.org/web/20160215085700/http://forum.minecraftuser.jp/viewtopic.php?f=13&t=17975).
+If there was an earlier gravity mod, please let me know.
+
+
+#
 
 Maintaining the fork because Immersive Portals mod depends on the Gravity changing mod, 
 and Fabric mod cannot depend on a Quilt mod.
