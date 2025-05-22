@@ -1,25 +1,42 @@
 (OLD) tag means the bug existed in the 1.20.4 version even before I ported it,
-      (and maybe even earlier) and also these are unlikely to be fixed by me.
+      (and maybe even earlier) I am unlikely to fix many of these, but
+      will probably try to fix the shrinking, walk animation, and model shift ones
 
 Negative directions shrink to crawl upon head hitting
 [HIGH PRIORITY] (OLD)
 
 Monster AI does not work in altered gravity
-[VERY, VERY LOW PRIORITY] (OLD)
+[VERY LOW PRIORITY] (OLD)
 https://github.com/Fusion-Flux/Gravity-Api/issues/23
+    (Need to look at the req. code to fix this and decide how the mod
+    should behave for monster AI if it is not feasible to implement,
+    it is clear they think they know where you are, but pathfinding
+    feels like it is unrealistic to fix ATM.)
+    I'm curious how spiders from that spider 2.0 mod will act
+    towards a rotated enemy, some clues may lie in that mod,
+    maybe compat. with that mod could have spiders working at least.
+    https://github.com/Nyfaria/NyfsSpiders/tree/1.21
+    https://github.com/tomalbrc/Spiders-2.0
 
 Visual Bugs:
 
-Gravity Switch Animation for player model rotates around the feet instead of the center of the player
+Gravity Switch Animation for player model rotates around the feet instead of the center of the player for opposites
+    -Intended for many rotations, the issue is this happens when rotating 180 degrees as well, aka north->south,
+     when it is instead supposed to rotate around the center for these, causing a snap at the end, try it and see)
 [MEDIUM PRIORITY] (OLD)
 
 Model is shifted downwards when sneaking
+    -Absolute DOWN, seems to do with the player model's placement relative to the hitbox/position
 [MEDIUM PRIORITY] (OLD)
     -may also solve: https://github.com/Fusion-Flux/Gravity-Api/issues/63
 
 Walk/Sprint Animations don't play along vertical axis
+    -a condition somewhere, intended so you don't wave your arms/legs like you are walking
+     when you are jumping/falling, but rotation is not implemented for this correctly.
 [MEDIUM PRIORITY] (OLD)
 https://github.com/qouteall/GravityChanger/issues/13
+
+---
 
 Missing Features:
 

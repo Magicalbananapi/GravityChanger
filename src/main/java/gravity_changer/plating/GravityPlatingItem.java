@@ -1,9 +1,8 @@
 package gravity_changer.plating;
 
-import gravity_changer.ModComponents;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.item.TooltipType;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
@@ -26,7 +25,7 @@ public class GravityPlatingItem extends BlockItem {
     
     public static void init() {
         Registry.register(
-            Registries.ITEM, new Identifier("gravity_changer:plating"),
+            Registries.ITEM, Identifier.of("gravity_changer:plating"),
             GravityPlatingItem.PLATING_BLOCK_ITEM
         );
     }

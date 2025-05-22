@@ -1,4 +1,4 @@
-package gravity_changer.mixin.unused;
+package gravity_changer.unused.mixin;
 
 import net.minecraft.entity.*;
 import net.minecraft.entity.player.PlayerEntity;

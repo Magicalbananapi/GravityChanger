@@ -6,6 +6,7 @@ import gravity_changer.api.GravityChangerAPI;
 import gravity_changer.util.RotationUtil;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -14,11 +15,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.WorldView;
 import org.joml.Quaternionf;
@@ -40,10 +37,10 @@ public abstract class EntityRenderDispatcherMixin {
     
     @Shadow
     private boolean renderShadows;
-    
+
     @Shadow
-    private static void drawShadowVertex(MatrixStack.Entry entry, VertexConsumer vertices, float alpha, float x, float y, float z, float u, float v) {}
-    
+    private static void drawShadowVertex(MatrixStack.Entry entry, VertexConsumer vertices, int alpha, float x, float y, float z, float u, float v) {}
+
     @Inject(
         method = "render(Lnet/minecraft/entity/Entity;DDDFFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
         at = @At(
@@ -141,7 +138,9 @@ public abstract class EntityRenderDispatcherMixin {
                         if (alpha > 1.0F) {
                             alpha = 1.0F;
                         }
-                        
+
+                        int i = ColorHelper.Argb.getArgb(MathHelper.floor(alpha * 255.0F), 255, 255, 255);
+
                         Vec3d centerPos = Vec3d.ofCenter(pos);
                         Vec3d playerCenterPos = RotationUtil.vecWorldToPlayer(centerPos, gravityDirection);
                         
@@ -158,19 +157,19 @@ public abstract class EntityRenderDispatcherMixin {
                         float minV = -(float) playerRelNN.z / 2.0F / radius + 0.5F;
                         float maxV = -(float) playerRelPP.z / 2.0F / radius + 0.5F;
 
-                        drawShadowVertex(entry, vertices, alpha, (float) relNN.x, (float) relNN.y, (float) relNN.z, minU, minV);
-                        drawShadowVertex(entry, vertices, alpha, (float) relNP.x, (float) relNP.y, (float) relNP.z, minU, maxV);
-                        drawShadowVertex(entry, vertices, alpha, (float) relPP.x, (float) relPP.y, (float) relPP.z, maxU, maxV);
-                        drawShadowVertex(entry, vertices, alpha, (float) relPN.x, (float) relPN.y, (float) relPN.z, maxU, minV);
+                        drawShadowVertex(entry, vertices, i, (float) relNN.x, (float) relNN.y, (float) relNN.z, minU, minV);
+                        drawShadowVertex(entry, vertices, i, (float) relNP.x, (float) relNP.y, (float) relNP.z, minU, maxV);
+                        drawShadowVertex(entry, vertices, i, (float) relPP.x, (float) relPP.y, (float) relPP.z, maxU, maxV);
+                        drawShadowVertex(entry, vertices, i, (float) relPN.x, (float) relPN.y, (float) relPN.z, maxU, minV);
                     }
                 }
             }
         }
     }
 
-    //TODO: Figure out why this seems to work despite the error
+    //TODO: I don't think this works, but Idk what it was even originally supposed to do, draw rotated dragon hitboxes?
     @ModifyVariable(
-        method = "renderHitbox(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;Lnet/minecraft/entity/Entity;F)V",
+        method = "renderHitbox",
         at = @At(
             value = "INVOKE_ASSIGN",
             target = "Lnet/minecraft/util/math/Box;offset(DDD)Lnet/minecraft/util/math/Box;",
@@ -188,7 +187,7 @@ public abstract class EntityRenderDispatcherMixin {
     }
     
     @Redirect(
-        method = "renderHitbox(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;Lnet/minecraft/entity/Entity;F)V",
+        method = "renderHitbox",
         at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/entity/Entity;getRotationVec(F)Lnet/minecraft/util/math/Vec3d;",

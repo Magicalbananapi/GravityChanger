@@ -10,6 +10,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.LightmapTextureManager;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Direction;
@@ -24,21 +25,23 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-//Verified Working 1.20.6
+//Verified Working as of 1.20.6
+@Debug(export = true)
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin {
     @Shadow @Final private Camera camera;
 
     //TODO: Figure out a better way to do this than shift.
-    @Inject(
+    //TODO: For some reason commenting everything out fixed it??? What changed to make this unneeded?
+    /*@Inject(
         method = "Lnet/minecraft/client/render/GameRenderer;renderWorld",
         at = @At(
             value = "INVOKE",
-            target = "Lorg/joml/Matrix4f;rotationXYZ(FFF)Lorg/joml/Matrix4f;",
+            target = "Lorg/joml/Matrix4f;rotation(Lorg/joml/Quaternionfc;)Lorg/joml/Matrix4f;",
             shift = At.Shift.BY, by = 2
         )
     )
-    private void inject_renderWorld(float tickDelta, long limitTime, CallbackInfo ci, @Local(ordinal = 1) Matrix4f matrix4f2) {
+    private void inject_renderWorld(RenderTickCounter tickCounter, CallbackInfo ci, @Local(ordinal = 1) Matrix4f matrix4f2) {
 
         if (this.camera.getFocusedEntity() != null) {
             Entity focusedEntity = this.camera.getFocusedEntity();
@@ -48,7 +51,10 @@ public abstract class GameRendererMixin {
             if (animation == null) {
                 return;
             }
-            long timeMs = focusedEntity.getWorld().getTime() * 50 + (long) (tickDelta * 50);
+
+            //TODO: Check if we want this to return 1.0 getTickDelta(false) or the real value
+            // while tick freeze is active
+            long timeMs = focusedEntity.getWorld().getTime() * 50 + (long) (tickCounter.getTickDelta(true) * 50);
             Quaternionf currentGravityRotation = animation.getCurrentGravityRotation(gravityDirection, timeMs);
 
             if (animation.isInAnimation()) {
@@ -57,5 +63,5 @@ public abstract class GameRendererMixin {
             }
             matrix4f2.rotate(currentGravityRotation);
         }
-    }
+    }*/
 }

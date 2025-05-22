@@ -2,6 +2,7 @@ package gravity_changer.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
 import gravity_changer.api.GravityChangerAPI;
 import gravity_changer.util.RotationUtil;
 import net.minecraft.entity.Entity;
@@ -224,20 +225,21 @@ public abstract class LivingEntityMixin extends Entity {
         
         return RotationUtil.vecWorldToPlayer(livingEntity.getX() - livingEntity.prevX, livingEntity.getY() - livingEntity.prevY, original.call(livingEntity) - livingEntity.prevZ, gravityDirection).z + livingEntity.prevZ;
     }
-    
+
+    //TODO: Verify this and the next, there was a significant change
     @Redirect(
         method = "damage(Lnet/minecraft/entity/damage/DamageSource;F)Z",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/entity/Entity;getX()D",
+            target = "Lnet/minecraft/util/math/Vec3d;getX()D",
             ordinal = 0
         )
     )
-    private double redirect_damage_getX_0(Entity attacker) {
+    private double redirect_damage_getX_0(Vec3d damageSourcePosition, @Local(ordinal = 0) Entity attacker) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity) (Object) this);
         if (gravityDirection == Direction.DOWN) {
             if (GravityChangerAPI.getGravityDirection(attacker) == Direction.DOWN) {
-                return attacker.getX();
+                return damageSourcePosition.getX();
             }
             else {
                 return attacker.getEyePos().x;
@@ -251,15 +253,15 @@ public abstract class LivingEntityMixin extends Entity {
         method = "damage(Lnet/minecraft/entity/damage/DamageSource;F)Z",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/entity/Entity;getZ()D",
+            target = "Lnet/minecraft/util/math/Vec3d;getZ()D",
             ordinal = 0
         )
     )
-    private double redirect_damage_getZ_0(Entity attacker) {
+    private double redirect_damage_getZ_0(Vec3d damageSourcePosition, @Local(ordinal = 0) Entity attacker) {
         Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity) (Object) this);
         if (gravityDirection == Direction.DOWN) {
             if (GravityChangerAPI.getGravityDirection(attacker) == Direction.DOWN) {
-                return attacker.getZ();
+                return damageSourcePosition.getZ();
             }
             else {
                 return attacker.getEyePos().z;

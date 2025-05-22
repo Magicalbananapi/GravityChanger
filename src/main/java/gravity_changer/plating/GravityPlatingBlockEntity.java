@@ -48,7 +48,7 @@ import java.util.List;
 public class GravityPlatingBlockEntity extends BlockEntity {
     private static final Logger LOGGER = LogUtils.getLogger();
     
-    public static final Identifier ID = new Identifier("gravity_changer:plating_block_entity");
+    public static final Identifier ID = Identifier.of("gravity_changer:plating_block_entity");
     public static BlockEntityType<GravityPlatingBlockEntity> TYPE;
     
     private static final int MAX_LEVEL = 64;

@@ -14,13 +14,13 @@ import net.minecraft.util.Identifier;
 public class GravityChangerComponents implements org.ladysnake.cca.api.v3.entity.EntityComponentInitializer, WorldComponentInitializer {
     
     public static final Identifier DATA_COMPONENT_ID =
-        new Identifier("gravity_changer", "gravity_data");
+        Identifier.of("gravity_changer", "gravity_data");
     
     public static final ComponentKey<GravityComponent> GRAVITY_COMP_KEY =
         ComponentRegistry.getOrCreate(DATA_COMPONENT_ID, GravityComponent.class);
     
     public static final Identifier DIMENSION_DATA_ID =
-        new Identifier("gravity_changer", "dimension_data");
+        Identifier.of("gravity_changer", "dimension_data");
     
     public static final ComponentKey<DimensionGravityDataComponent> DIMENSION_COMP_KEY =
         ComponentRegistry.getOrCreate(DIMENSION_DATA_ID, DimensionGravityDataComponent.class);

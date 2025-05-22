@@ -1,11 +1,15 @@
 package gravity_changer.mixin;
 
+import com.llamalad7.mixinextras.sugar.Local;
+import com.mojang.logging.LogUtils;
 import gravity_changer.GravityChangerMod;
 import gravity_changer.api.GravityChangerAPI;
 import gravity_changer.util.RotationUtil;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
+import it.unimi.dsi.fastutil.floats.FloatArraySet;
+import it.unimi.dsi.fastutil.floats.FloatArrays;
+import it.unimi.dsi.fastutil.floats.FloatSet;
+import org.slf4j.Logger;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
@@ -16,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
+import java.util.Arrays;
 import java.util.List;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -34,6 +39,7 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
 
+//@Debug(export = true)
 @Mixin(Entity.class)
 public abstract class EntityMixin {
 
@@ -224,7 +230,8 @@ public abstract class EntityMixin {
         BlockPos blockPos = BlockPos.ofFloored(RotationUtil.vecPlayerToWorld(0.0D, -0.20000000298023224D, 0.0D, gravityDirection).add(this.pos));
         cir.setReturnValue(blockPos);
     }
-    
+
+    //1.20.6 -> 1.21.1 - Unchanged
     // transform the argument to local coordinate
     @ModifyVariable(
         method = "adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;",
@@ -244,9 +251,10 @@ public abstract class EntityMixin {
         
         return RotationUtil.vecWorldToPlayer(vec3d, gravityDirection);
     }
-    
+
+    //1.20.6 -> 1.21.1 - Unchanged
     // transform the result to world coordinate
-    // the input to Entity.collideBoundingBox will be in local coord
+    // the input to Entity.adjustMovementForCollisions will be in local coord
     @Inject(
         method = "adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;",
         at = @At("RETURN"),
@@ -258,7 +266,7 @@ public abstract class EntityMixin {
         
         cir.setReturnValue(RotationUtil.vecPlayerToWorld(cir.getReturnValue(), gravityDirection));
     }
-    
+
     // the argument was transformed to local coord,
     // but bounding box stretch needs world coord
     @ModifyArgs(
@@ -275,22 +283,112 @@ public abstract class EntityMixin {
         args.set(1, rotate.y);
         args.set(2, rotate.z);
     }
-    
+
     // the argument was transformed to local coord,
     // but bounding box move needs world coord
     @ModifyArgs(
         method = "adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/util/math/Box;offset(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Box;"
+            target = "Lnet/minecraft/util/math/Box;offset(DDD)Lnet/minecraft/util/math/Box;"
         )
     )
     private void redirect_adjustMovementForCollisions_offset_0(Args args) {
+        Vec3d rotate = new Vec3d(args.get(0), args.get(1), args.get(2));
+        rotate = RotationUtil.vecPlayerToWorld(rotate, GravityChangerAPI.getGravityDirection((Entity) (Object) this));
+        args.set(0, rotate.x);
+        args.set(1, rotate.y);
+        args.set(2, rotate.z);
+    }
+
+    // the argument was transformed to local coord,
+    // but this adjustMovementForCollisions needs world coord
+    @ModifyArgs(
+            method = "adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/entity/Entity;adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Ljava/util/List;)Lnet/minecraft/util/math/Vec3d;"
+            )
+    )
+    private void redirect_adjustMovementForCollisions_vec_0(Args args) {
         Vec3d rotate = args.get(0);
         rotate = RotationUtil.vecPlayerToWorld(rotate, GravityChangerAPI.getGravityDirection((Entity) (Object) this));
         args.set(0, rotate);
     }
-    
+
+    //I know there is a better way to do this but I was unable to figure it out.
+    // I've been working on this too long already and I don't think this will
+    // be problematic for performance which is all I care about at this point
+    @Redirect(
+            method = "adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/entity/Entity;collectStepHeights(Lnet/minecraft/util/math/Box;Ljava/util/List;FF)[F",
+                    ordinal = 0
+            )
+    )
+    private float[] redirect_collectStepHeights(Box boxSnappedToGround, List<VoxelShape> allCollisions, float stepHeight, float distToGround) {
+        FloatSet floatSet = new FloatArraySet(4);
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
+
+        double relativeBottom = getRelativeBottom(boxSnappedToGround, gravityDirection);
+
+        if(gravityDirection.getDirection() == Direction.AxisDirection.NEGATIVE) {
+            for (VoxelShape voxelShape : allCollisions) {
+                for (double collisionPoint : voxelShape.getPointPositions(gravityDirection.getAxis())) {
+                    float verticalDist = (float)(collisionPoint - relativeBottom);
+
+                    if (!(verticalDist < 0.0F) && verticalDist != distToGround) {
+                        if (verticalDist > stepHeight) {
+                            break;
+                        }
+
+                        floatSet.add(verticalDist);
+                    }
+                }
+            }
+        } else {
+            for (VoxelShape voxelShape : allCollisions) {
+                for (double collisionPoint : voxelShape.getPointPositions(gravityDirection.getAxis()).reversed()) {
+                    float verticalDist = -(float)(collisionPoint - relativeBottom);
+
+                    if (!(verticalDist < 0.0F) && verticalDist != distToGround) {
+                        if (verticalDist > stepHeight) {
+                            break;
+                        }
+
+                        floatSet.add(verticalDist);
+                    }
+                }
+            }
+        }
+
+
+        float[] fs = floatSet.toFloatArray();
+
+        FloatArrays.unstableSort(fs);
+        return fs;
+    }
+
+    @Unique
+    private static double getRelativeBottom(Box boxSnappedToGround, Direction gravityDirection) {
+        double relativeBottom = boxSnappedToGround.minY;
+        if(gravityDirection == Direction.DOWN)
+            relativeBottom = boxSnappedToGround.minY;
+        else if(gravityDirection == Direction.UP)
+            relativeBottom = boxSnappedToGround.maxY;
+        else if(gravityDirection == Direction.NORTH)
+            relativeBottom = boxSnappedToGround.minZ;
+        else if(gravityDirection == Direction.SOUTH)
+            relativeBottom = boxSnappedToGround.maxZ;
+        else if(gravityDirection == Direction.WEST)
+            relativeBottom = boxSnappedToGround.minX;
+        else if(gravityDirection == Direction.EAST)
+            relativeBottom = boxSnappedToGround.maxX;
+        return relativeBottom;
+    }
+
+    //1.20.6 -> 1.21.1 - Unchanged
     // Entity.collideBoundingBox is inputed with local coord, transform it to world coord
     @ModifyVariable(
         method = "adjustMovementForCollisions(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Lnet/minecraft/world/World;Ljava/util/List;)Lnet/minecraft/util/math/Vec3d;",
@@ -310,24 +408,22 @@ public abstract class EntityMixin {
         
         return RotationUtil.vecPlayerToWorld(vec3d, gravityDirection);
     }
-    
-    // transform back to local coord
-    @Inject(
-        method = "adjustMovementForCollisions(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Lnet/minecraft/world/World;Ljava/util/List;)Lnet/minecraft/util/math/Vec3d;",
-        at = @At("RETURN"),
-        cancellable = true
-    )
-    private static void inject_adjustMovementForCollisions(Entity entity, Vec3d movement, Box entityBoundingBox, World world, List<VoxelShape> collisions, CallbackInfoReturnable<Vec3d> cir) {
-        if (entity == null) return;
-        
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(entity);
-        if (gravityDirection == Direction.DOWN) return;
-        
-        cir.setReturnValue(RotationUtil.vecWorldToPlayer(cir.getReturnValue(), gravityDirection));
-    }
 
+    //1.20.6 -> 1.21.1 - Unchanged
     //TODO: This changes WAY too much and is at risk of incompatibility with other mods and updates
     // however the last method like this I fixed took over an hour, so I'll leave it alone for now
+    @Redirect(
+            method = "adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/entity/Entity;adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Ljava/util/List;)Lnet/minecraft/util/math/Vec3d;",
+                    ordinal = 0
+            )
+    )
+    private Vec3d redirect_adjustMovementForCollisions_adjustMovementForCollisions_0(Vec3d movement, Box entityBoundingBox, List<VoxelShape> collisions) {
+        return redirection(movement, entityBoundingBox, collisions, (Entity) (Object) this);
+    }
+
     @Redirect(
         method = "adjustMovementForCollisions(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/math/Box;Lnet/minecraft/world/World;Ljava/util/List;)Lnet/minecraft/util/math/Vec3d;",
         at = @At(
@@ -337,11 +433,16 @@ public abstract class EntityMixin {
         )
     )
     private static Vec3d redirect_adjustMovementForCollisions_adjustMovementForCollisions_0(Vec3d movement, Box entityBoundingBox, List<VoxelShape> collisions, Entity entity) {
+        return redirection(movement, entityBoundingBox, collisions, entity);
+    }
+
+    @Unique
+    private static Vec3d redirection(Vec3d movement, Box entityBoundingBox, List<VoxelShape> collisions, Entity entity) {
         Direction gravityDirection;
         if (entity == null || (gravityDirection = GravityChangerAPI.getGravityDirection(entity)) == Direction.DOWN) {
             return adjustMovementForCollisions(movement, entityBoundingBox, collisions);
         }
-        
+
         Vec3d playerMovement = RotationUtil.vecWorldToPlayer(movement, gravityDirection);
         double playerMovementX = playerMovement.x;
         double playerMovementY = playerMovement.y;
@@ -355,7 +456,7 @@ public abstract class EntityMixin {
                 entityBoundingBox = entityBoundingBox.offset(RotationUtil.vecPlayerToWorld(0.0D, playerMovementY, 0.0D, gravityDirection));
             }
         }
-        
+
         boolean isZLargerThanX = Math.abs(playerMovementX) < Math.abs(playerMovementZ);
         if (isZLargerThanX && playerMovementZ != 0.0D) {
             playerMovementZ = VoxelShapes.calculateMaxOffset(directionZ.getAxis(), entityBoundingBox, collisions, playerMovementZ * directionZ.getDirection().offset()) * directionZ.getDirection().offset();
@@ -363,19 +464,19 @@ public abstract class EntityMixin {
                 entityBoundingBox = entityBoundingBox.offset(RotationUtil.vecPlayerToWorld(0.0D, 0.0D, playerMovementZ, gravityDirection));
             }
         }
-        
+
         if (playerMovementX != 0.0D) {
             playerMovementX = VoxelShapes.calculateMaxOffset(directionX.getAxis(), entityBoundingBox, collisions, playerMovementX * directionX.getDirection().offset()) * directionX.getDirection().offset();
             if (!isZLargerThanX && playerMovementX != 0.0D) {
                 entityBoundingBox = entityBoundingBox.offset(RotationUtil.vecPlayerToWorld(playerMovementX, 0.0D, 0.0D, gravityDirection));
             }
         }
-        
+
         if (!isZLargerThanX && playerMovementZ != 0.0D) {
             playerMovementZ = VoxelShapes.calculateMaxOffset(directionZ.getAxis(), entityBoundingBox, collisions, playerMovementZ * directionZ.getDirection().offset()) * directionZ.getDirection().offset();
         }
-        
-        return RotationUtil.vecPlayerToWorld(playerMovementX, playerMovementY, playerMovementZ, gravityDirection);
+        return new Vec3d(playerMovementX, playerMovementY, playerMovementZ);
+        //return RotationUtil.vecPlayerToWorld(playerMovementX, playerMovementY, playerMovementZ, gravityDirection);
     }
     
     @ModifyArgs(

@@ -12,9 +12,9 @@ public class GravityInvertMobEffect extends StatusEffect {
     
     public static final int COLOR = 0x98D982;
     
-    public static final Identifier PHASE = new Identifier("gravity_changer:invert_mob_effect_phase");
+    public static final Identifier PHASE = Identifier.of("gravity_changer:invert_mob_effect_phase");
     
-    public static final Identifier ID = new Identifier("gravity_changer:invert");
+    public static final Identifier ID = Identifier.of("gravity_changer:invert");
     
     public static final GravityInvertMobEffect INSTANCE = new GravityInvertMobEffect();
     

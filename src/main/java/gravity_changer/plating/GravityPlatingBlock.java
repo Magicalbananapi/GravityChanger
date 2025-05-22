@@ -69,7 +69,7 @@ public class GravityPlatingBlock extends BlockWithEntity {
     
     public static void init() {
         Registry.register(
-            Registries.BLOCK, new Identifier("gravity_changer:plating"), PLATING_BLOCK
+            Registries.BLOCK, Identifier.of("gravity_changer:plating"), PLATING_BLOCK
         );
     }
     

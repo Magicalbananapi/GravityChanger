@@ -63,12 +63,12 @@ public class GravityPotion {
     
     public static Identifier getPotionId(Direction direction) {
         return switch (direction) {
-            case DOWN -> new Identifier("gravity_changer:gravity_down_0");
-            case UP -> new Identifier("gravity_changer:gravity_up_0");
-            case NORTH -> new Identifier("gravity_changer:gravity_north_0");
-            case SOUTH -> new Identifier("gravity_changer:gravity_south_0");
-            case WEST -> new Identifier("gravity_changer:gravity_west_0");
-            case EAST -> new Identifier("gravity_changer:gravity_east_0");
+            case DOWN -> Identifier.of("gravity_changer:gravity_down_0");
+            case UP -> Identifier.of("gravity_changer:gravity_up_0");
+            case NORTH -> Identifier.of("gravity_changer:gravity_north_0");
+            case SOUTH -> Identifier.of("gravity_changer:gravity_south_0");
+            case WEST -> Identifier.of("gravity_changer:gravity_west_0");
+            case EAST -> Identifier.of("gravity_changer:gravity_east_0");
         };
     }
     
@@ -90,37 +90,37 @@ public class GravityPotion {
     public static void init() {
         Registry.register(
             Registries.POTION,
-            new Identifier("gravity_changer:gravity_decr_0"),
+            Identifier.of("gravity_changer:gravity_decr_0"),
             STRENGTH_DECR_POTION_0
         );
         
         Registry.register(
             Registries.POTION,
-            new Identifier("gravity_changer:gravity_decr_1"),
+            Identifier.of("gravity_changer:gravity_decr_1"),
             STRENGTH_DECR_POTION_1
         );
         
         Registry.register(
             Registries.POTION,
-            new Identifier("gravity_changer:gravity_incr_0"),
+            Identifier.of("gravity_changer:gravity_incr_0"),
             STRENGTH_INCR_POTION_0
         );
         
         Registry.register(
             Registries.POTION,
-            new Identifier("gravity_changer:gravity_incr_1"),
+            Identifier.of("gravity_changer:gravity_incr_1"),
             STRENGTH_INCR_POTION_1
         );
         
         Registry.register(
             Registries.POTION,
-            new Identifier("gravity_changer:gravity_reverse_0"),
+            Identifier.of("gravity_changer:gravity_reverse_0"),
             STRENGTH_REVERSE_POTION_0
         );
         
         Registry.register(
             Registries.POTION,
-            new Identifier("gravity_changer:gravity_reverse_1"),
+            Identifier.of("gravity_changer:gravity_reverse_1"),
             STRENGTH_REVERSE_POTION_1
         );
         

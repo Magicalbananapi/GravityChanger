@@ -14,7 +14,7 @@ import net.minecraft.util.math.Direction;
 public class GravityDirectionMobEffect extends StatusEffect {
     public static final int COLOR = 0x98D982;
     
-    public static final Identifier PHASE = new Identifier("gravity_changer:dir_mob_effect_phase");
+    public static final Identifier PHASE = Identifier.of("gravity_changer:dir_mob_effect_phase");
     
     public final Direction gravityDirection;
     
@@ -35,12 +35,12 @@ public class GravityDirectionMobEffect extends StatusEffect {
     
     public static Identifier getEffectId(Direction direction) {
         return switch (direction) {
-            case DOWN -> new Identifier("gravity_changer:down");
-            case UP -> new Identifier("gravity_changer:up");
-            case NORTH -> new Identifier("gravity_changer:north");
-            case SOUTH -> new Identifier("gravity_changer:south");
-            case WEST -> new Identifier("gravity_changer:west");
-            case EAST -> new Identifier("gravity_changer:east");
+            case DOWN -> Identifier.of("gravity_changer:down");
+            case UP -> Identifier.of("gravity_changer:up");
+            case NORTH -> Identifier.of("gravity_changer:north");
+            case SOUTH -> Identifier.of("gravity_changer:south");
+            case WEST -> Identifier.of("gravity_changer:west");
+            case EAST -> Identifier.of("gravity_changer:east");
         };
     }
 

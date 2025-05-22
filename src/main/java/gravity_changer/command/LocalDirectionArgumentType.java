@@ -62,7 +62,7 @@ public class LocalDirectionArgumentType implements ArgumentType<LocalDirection> 
     
     public static void init() {
         ArgumentTypeRegistry.registerArgumentType(
-            new Identifier("gravity_changer:local_direction"),
+            Identifier.of("gravity_changer:local_direction"),
             LocalDirectionArgumentType.class,
             ConstantArgumentSerializer.of(() -> LocalDirectionArgumentType.instance)
         );

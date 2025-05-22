@@ -4,7 +4,7 @@ import gravity_changer.GravityChangerMod;
 import gravity_changer.api.GravityChangerAPI;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.item.TooltipType;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -57,12 +57,12 @@ public class GravityChangerItem extends Item {
     }
     
     public static void init() {
-        Registry.register(Registries.ITEM, new Identifier(GravityChangerMod.NAMESPACE, "gravity_changer_down"), GRAVITY_CHANGER_DOWN);
-        Registry.register(Registries.ITEM, new Identifier(GravityChangerMod.NAMESPACE, "gravity_changer_up"), GRAVITY_CHANGER_UP);
-        Registry.register(Registries.ITEM, new Identifier(GravityChangerMod.NAMESPACE, "gravity_changer_north"), GRAVITY_CHANGER_NORTH);
-        Registry.register(Registries.ITEM, new Identifier(GravityChangerMod.NAMESPACE, "gravity_changer_south"), GRAVITY_CHANGER_SOUTH);
-        Registry.register(Registries.ITEM, new Identifier(GravityChangerMod.NAMESPACE, "gravity_changer_west"), GRAVITY_CHANGER_WEST);
-        Registry.register(Registries.ITEM, new Identifier(GravityChangerMod.NAMESPACE, "gravity_changer_east"), GRAVITY_CHANGER_EAST);
+        Registry.register(Registries.ITEM, Identifier.of(GravityChangerMod.NAMESPACE, "gravity_changer_down"), GRAVITY_CHANGER_DOWN);
+        Registry.register(Registries.ITEM, Identifier.of(GravityChangerMod.NAMESPACE, "gravity_changer_up"), GRAVITY_CHANGER_UP);
+        Registry.register(Registries.ITEM, Identifier.of(GravityChangerMod.NAMESPACE, "gravity_changer_north"), GRAVITY_CHANGER_NORTH);
+        Registry.register(Registries.ITEM, Identifier.of(GravityChangerMod.NAMESPACE, "gravity_changer_south"), GRAVITY_CHANGER_SOUTH);
+        Registry.register(Registries.ITEM, Identifier.of(GravityChangerMod.NAMESPACE, "gravity_changer_west"), GRAVITY_CHANGER_WEST);
+        Registry.register(Registries.ITEM, Identifier.of(GravityChangerMod.NAMESPACE, "gravity_changer_east"), GRAVITY_CHANGER_EAST);
     }
     
 }

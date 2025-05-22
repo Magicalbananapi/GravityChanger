@@ -58,19 +58,19 @@ public class GravityStrengthMobEffect extends StatusEffect {
         
         Registry.register(
             Registries.STATUS_EFFECT,
-            new Identifier("gravity_changer:strength_increase"),
+            Identifier.of("gravity_changer:strength_increase"),
             INCREASE
         );
         
         Registry.register(
             Registries.STATUS_EFFECT,
-            new Identifier("gravity_changer:strength_decrease"),
+            Identifier.of("gravity_changer:strength_decrease"),
             DECREASE
         );
         
         Registry.register(
             Registries.STATUS_EFFECT,
-            new Identifier("gravity_changer:strength_reverse"),
+            Identifier.of("gravity_changer:strength_reverse"),
             REVERSE
         );
     }

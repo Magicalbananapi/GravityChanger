@@ -3,7 +3,7 @@ package gravity_changer.item;
 import gravity_changer.GravityComponent;
 import java.util.EnumMap;
 import java.util.List;
-import net.minecraft.client.item.TooltipType;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -51,7 +51,7 @@ public class GravityAnchorItem extends Item {
     }
     
     public static Identifier getItemId(Direction direction) {
-        return new Identifier("gravity_changer", "gravity_anchor_" + direction.getName());
+        return Identifier.of("gravity_changer", "gravity_anchor_" + direction.getName());
     }
     
     public GravityAnchorItem(Direction _direction, Settings settings) {

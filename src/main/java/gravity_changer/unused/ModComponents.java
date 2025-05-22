@@ -1,12 +1,8 @@
-package gravity_changer;
+package gravity_changer.unused;
 
-import gravity_changer.plating.GravityPlatingBlockEntity;
-import net.minecraft.component.DataComponentType;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
+import gravity_changer.GravityChangerMod;
+//import net.minecraft.component.DataComponentType;
 
-import java.util.function.UnaryOperator;
 
 public class ModComponents {
     protected static void initialize() {
@@ -14,7 +10,7 @@ public class ModComponents {
         GravityChangerMod.LOGGER.info("Registering {} components", GravityChangerMod.NAMESPACE);
     }
 
-    public static <T> DataComponentType<T> register(String path, UnaryOperator<DataComponentType.Builder<T>> builderOperator) {
+    /*public static <T> DataComponentType<T> register(String path, UnaryOperator<DataComponentType.Builder<T>> builderOperator) {
         return Registry.register(Registries.DATA_COMPONENT_TYPE, Identifier.of("tutorial", path), builderOperator.apply(DataComponentType.builder()).build());
     }
 
@@ -22,5 +18,5 @@ public class ModComponents {
             Registries.DATA_COMPONENT_TYPE,
             Identifier.of(GravityChangerMod.NAMESPACE, "side_data"),
             DataComponentType.<GravityPlatingBlockEntity.SideData>builder().codec(null).build()
-    );
+    );*/
 }

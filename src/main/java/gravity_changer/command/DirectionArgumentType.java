@@ -63,7 +63,7 @@ public class DirectionArgumentType implements ArgumentType<Direction> {
     
     public static void init() {
         ArgumentTypeRegistry.registerArgumentType(
-            new Identifier("gravity_changer:direction"),
+            Identifier.of("gravity_changer:direction"),
             DirectionArgumentType.class,
             ConstantArgumentSerializer.of(() -> DirectionArgumentType.instance)
         );

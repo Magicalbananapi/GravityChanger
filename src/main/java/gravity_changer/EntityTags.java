@@ -22,7 +22,7 @@ public class EntityTags {
      */
     public static final TagKey<EntityType<?>> ALLOWED_SPECIAL = TagKey.of(
         Registries.ENTITY_TYPE.getKey(),
-        new Identifier("gravity_changer", "allowed_special")
+        Identifier.of("gravity_changer", "allowed_special")
     );
     
     public static boolean canChangeGravity(Entity entity) {

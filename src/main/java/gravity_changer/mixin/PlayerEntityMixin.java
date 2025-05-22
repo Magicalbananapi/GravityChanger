@@ -26,13 +26,6 @@ import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 @Debug(export = true)
 @Mixin(value = PlayerEntity.class, priority = 1001)
 public abstract class PlayerEntityMixin extends LivingEntity {
-    @Shadow @Final private PlayerAbilities abilities;
-
-    @Shadow protected abstract boolean clipAtLedge();
-    @Shadow protected abstract boolean method_30263(float stepHeight); //isAboveGround
-
-    @Shadow protected abstract boolean method_59818(double d, double e, float f);
-
     protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) { super(entityType, world); }
 
     @WrapOperation(
@@ -153,103 +146,16 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         cir.setReturnValue(RotationUtil.vecPlayerToWorld(movement, gravityDirection));
     }
 
-
-
-    /*@Inject(
-            method = "adjustMovementForSneaking",
-            at = @At("HEAD"),
-            cancellable = true
-    )
-    private void inject_adjustMovementForSneaking(Vec3d movement, MovementType type, CallbackInfoReturnable<Vec3d> cir) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(this);
-        if (gravityDirection == Direction.DOWN) return;
-
-        movement = RotationUtil.vecWorldToPlayer(movement, gravityDirection);
-
-        float f = this.getStepHeight();
-        if (!this.abilities.flying
-                //&& !(movement.y > 0.0)
-                && (type == MovementType.SELF || type == MovementType.PLAYER)
-                && this.clipAtLedge()
-                && this.isAboveGround(f)) {
-            double d = movement.x;
-            double e = movement.z;
-            double h = Math.signum(d) * 0.05;
-
-            double i;
-            for (i = Math.signum(e) * 0.05; d != 0.0 && this.method_59818(d, 0.0, f); d -= h) {
-                if (Math.abs(d) <= 0.05) {
-                    d = 0.0;
-                    break;
-                }
-            }
-
-            while (e != 0.0 && this.method_59818(0.0, e, f)) {
-                if (Math.abs(e) <= 0.05) {
-                    e = 0.0;
-                    break;
-                }
-
-                e -= i;
-            }
-
-            while (d != 0.0 && e != 0.0 && this.method_59818(d, e, f)) {
-                if (Math.abs(d) <= 0.05) {
-                    d = 0.0;
-                } else {
-                    d -= h;
-                }
-
-                if (Math.abs(e) <= 0.05) {
-                    e = 0.0;
-                } else {
-                    e -= i;
-                }
-            }
-
-            cir.setReturnValue(RotationUtil.vecPlayerToWorld(d, movement.y, e, gravityDirection));
-        } else {
-            cir.setReturnValue(RotationUtil.vecPlayerToWorld(movement, gravityDirection));
-        }
-    }
-
-    private boolean isSpaceAroundPlayerEmpty(double d, double e, float f) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection(this);
-        Box box = this.getBoundingBox();
-        box = this.getBoundingBox().offset(RotationUtil.vecPlayerToWorld(d, -f, 0.0, gravityDirection));
-        box = this.getBoundingBox().offset(RotationUtil.vecPlayerToWorld(0.0, -f, e, gravityDirection));
-        box = this.getBoundingBox().offset(RotationUtil.vecPlayerToWorld(d, -f, e, gravityDirection));
-        box = new Box(box.minX + d, box.minY + f, box.minZ + e, box.maxX + d, box.maxY + f, box.maxZ + e);
-        box = this.getBoundingBox();
-        box = new Box(box.minX + d, box.minY - f - 1.0E-5F, box.minZ + e, box.maxX + d, box.minY, box.maxZ + e);
-        return this.getWorld().isSpaceEmpty(this, box);
-    }
-
-    private boolean isAboveGround(float f) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity) (Object) this);
-        Box box =  this.getBoundingBox();
-        double x = 0.0;
-        double y = this.fallDistance - f;
-        double z = 0.0;
-
-        if (gravityDirection == Direction.DOWN) {
-            return this.isOnGround() || this.fallDistance < f && !this.getWorld().isSpaceEmpty(this, box.offset(x, y, z));
-        }
-
-        Vec3d world = RotationUtil.vecPlayerToWorld(x, y, z, gravityDirection);
-        return this.isOnGround() || this.fallDistance < f && !this.getWorld().isSpaceEmpty(this, box.offset(world.x, world.y, world.z));
-    }*/
-
     //Might break with small enough scales using pehkui,
     // but at that scale this will be your last problem
     @Redirect(
-            method = "method_59818", //isSpaceAroundPlayerEmpty
+            method = "isSpaceAroundPlayerEmpty", //isSpaceAroundPlayerEmpty
             at = @At(
                     value = "NEW",
                     target = "(DDDDDD)Lnet/minecraft/util/math/Box;"
             )
     )
-    private Box redirect_method_59818_new_box(
+    private Box redirect_isSpaceAroundPlayerEmpty_new_box(
             double x1, double y1, double z1, double x2, double y2, double z2,
             @Local(ordinal = 0, argsOnly = true) double offsetX,
             @Local(ordinal = 1, argsOnly = true) double offsetZ,
@@ -262,10 +168,6 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         return new Box(
                 box.minX + offsets.x + margin, box.minY + offsets.y + margin, box.minZ + offsets.z + margin,
                 box.maxX + offsets.x - margin, box.maxY + offsets.y - margin, box.maxZ + offsets.z - margin);
-
-        //return RotationUtil.boxPlayerToWorld(
-        //        new Box(box.minX + 1.0E-7 + offsetX, box.minY - 1.0E-7 - offsetY, box.minZ + 1.0E-7 + offsetZ,
-        //                box.maxX - 1.0E-7 + offsetX, box.maxY + 1.0E-7 - offsetY, box.maxZ - 1.0E-7 + offsetZ), gravityDirection);
     }
     
     @WrapOperation(

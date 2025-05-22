@@ -52,8 +52,10 @@ public abstract class CameraMixin {
             original.call(this, x, y, z);
             return;
         }
-        
-        float partialTick = MinecraftClient.getInstance().getTickDelta();
+
+        //TODO: Check if we want this to return 1.0 getTickDelta(false) or the real value
+        // while tick freeze is active
+        float partialTick = MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(true);//getTickDelta();
         long timeMs = focusedEntity.getWorld().getTime() * 50 + (long) (partialTick * 50);
         animation.update(timeMs);
         if (gravityDirection == Direction.DOWN && !animation.isInAnimation()) {
@@ -102,7 +104,10 @@ public abstract class CameraMixin {
             if (gravityDirection == Direction.DOWN && !animation.isInAnimation()) {
                 return;
             }
-            float partialTick = MinecraftClient.getInstance().getTickDelta();
+
+            //TODO: Check if we want this to return 1.0 getTickDelta(false) or the real value
+            // while tick freeze is active
+            float partialTick = MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(true);//getTickDelta();
             long timeMs = focusedEntity.getWorld().getTime() * 50 + (long) (partialTick * 50);
             Quaternionf rotation = new Quaternionf(animation.getCurrentGravityRotation(gravityDirection, timeMs));
             rotation.conjugate();
