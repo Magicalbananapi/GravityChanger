@@ -10,7 +10,7 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.Text;
 
 public class GravityChangerModClient implements ClientModInitializer {
-    private static final String ISSUE_LINK = "https://github.com/qouteall/GravityChanger/issues";
+    private static final String ISSUE_LINK = "https://github.com/Magicalbananapi/GravityChanger/issues";
     private static boolean displayPreviewWarning = true;
     
     @Override
