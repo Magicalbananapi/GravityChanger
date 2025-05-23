@@ -19,6 +19,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Optional;
+
 //TODO: Appears unchanged, but verify
 @Mixin(value = Camera.class, priority = 1001)
 public abstract class CameraMixin {
@@ -115,4 +117,27 @@ public abstract class CameraMixin {
             this.rotation.set(rotation.x(), rotation.y(), rotation.z(), rotation.w());
         }
     }
+
+    //Old method for reference
+    /*@Inject(
+            method = "setRotation",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lorg/joml/Quaternionf;rotationYXZ(FFF)Lorg/joml/Quaternionf;",
+                    shift = At.Shift.AFTER
+            )
+    )
+    private void inject_setRotation(CallbackInfo ci) {
+        if(this.focusedEntity !=null) {
+            Direction gravityDirection = GravityChangerAPI.getGravityDirection(this.focusedEntity);
+            Optional<RotationAnimation> animationOptional = GravityChangerAPI.getGravityAnimation(focusedEntity);
+            if(animationOptional.isEmpty()) return;
+            RotationAnimation animation = animationOptional.get();
+            if (gravityDirection == Direction.DOWN && !animation.isInAnimation()) return;
+            long timeMs = focusedEntity.getWorld().getTime()*50+(long)(storedTickDelta*50);
+            Quaternionf rotation = animation.getCurrentGravityRotation(gravityDirection, timeMs).conjugate();
+            Quaternionf product = CompatMath.hamiltonProduct(rotation,this.rotation);
+            this.rotation.set(product.x(), product.y(), product.z(), product.w());
+        }
+    }*/
 }

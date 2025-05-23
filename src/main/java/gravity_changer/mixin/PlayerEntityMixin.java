@@ -258,7 +258,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
         args.set(1, vec3d.y);
         args.set(2, vec3d.z);
     }
-    
+
     @WrapOperation(
         method = "canChangeIntoPose",
         at = @At(
@@ -272,6 +272,12 @@ public abstract class PlayerEntityMixin extends LivingEntity {
             return original.call(dimensions, pos);
         }
 
-        return RotationUtil.makeBoxFromDimensions(dimensions, gravityDirection, pos);
+        Box box = dimensions.getBoxAt(0, 0, 0);
+        //Box box = original.call(dimensions, pos).offset(pos.negate());
+        if (gravityDirection.getDirection() == Direction.AxisDirection.POSITIVE) {
+            box = box.offset(0.0D, -1.0E-6D, 0.0D);
+        }
+        return RotationUtil.boxPlayerToWorld(box, gravityDirection).offset(pos);
+
     }
 }

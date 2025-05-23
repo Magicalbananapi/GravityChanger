@@ -248,11 +248,4 @@ public abstract class RotationUtil {
     public static Quaternionf interpolate(Quaternionf startGravityRotation, Quaternionf endGravityRotation, float progress) {
         return new Quaternionf().set(startGravityRotation).slerp(endGravityRotation, progress);
     }
-    
-    public static Box makeBoxFromDimensions(
-        EntityDimensions dimensions, Direction gravityDir, Vec3d pos
-    ) {
-        Box rawBox = dimensions.getBoxAt(0, 0, 0);
-        return boxPlayerToWorld(rawBox, gravityDir).offset(pos);
-    }
 }

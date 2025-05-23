@@ -33,35 +33,49 @@ public abstract class GameRendererMixin {
 
     //TODO: Figure out a better way to do this than shift.
     //TODO: For some reason commenting everything out fixed it??? What changed to make this unneeded?
-    /*@Inject(
+
+    //TODO: Not sure what is/isn't working elsewhere that made this pair with the CameraMixin
+    // act differently, but I make sure to do the terrain update here now so we don't have culling issues
+
+    //TODO: unable to locate method mapping
+    @Inject(
         method = "Lnet/minecraft/client/render/GameRenderer;renderWorld",
         at = @At(
             value = "INVOKE",
             target = "Lorg/joml/Matrix4f;rotation(Lorg/joml/Quaternionfc;)Lorg/joml/Matrix4f;",
-            shift = At.Shift.BY, by = 2
+            shift = At.Shift.BY, by = 2, remap = false
         )
     )
     private void inject_renderWorld(RenderTickCounter tickCounter, CallbackInfo ci, @Local(ordinal = 1) Matrix4f matrix4f2) {
+        //OLD
+        /*if (this.camera.getFocusedEntity() != null) {
+            Entity focusedEntity = this.camera.getFocusedEntity();
+            Direction gravityDirection = GravityChangerAPI.getGravityDirection(focusedEntity);
+            RotationAnimation animationOptional = GravityChangerAPI.getRotationAnimation(focusedEntity);
+            long timeMs = focusedEntity.getWorld().getTime()*50+(long)(tickDelta*50);
+            Quaternionf currentGravityRotation = animation.getCurrentGravityRotation(gravityDirection, timeMs);
+            matrix.multiply(currentGravityRotation);
+        }*/
 
         if (this.camera.getFocusedEntity() != null) {
             Entity focusedEntity = this.camera.getFocusedEntity();
-            Direction gravityDirection = GravityChangerAPI.getGravityDirection(focusedEntity);
+            //Direction gravityDirection = GravityChangerAPI.getGravityDirection(focusedEntity);
 
             RotationAnimation animation = GravityChangerAPI.getRotationAnimation(focusedEntity);
             if (animation == null) {
                 return;
             }
 
-            //TODO: Check if we want this to return 1.0 getTickDelta(false) or the real value
+            //tod: Check if we want this to return 1.0 getTickDelta(false) or the real value
             // while tick freeze is active
-            long timeMs = focusedEntity.getWorld().getTime() * 50 + (long) (tickCounter.getTickDelta(true) * 50);
-            Quaternionf currentGravityRotation = animation.getCurrentGravityRotation(gravityDirection, timeMs);
+            //long timeMs = focusedEntity.getWorld().getTime() * 50 + (long) (tickCounter.getTickDelta(true) * 50);
+            //Quaternionf currentGravityRotation = animation.getCurrentGravityRotation(gravityDirection, timeMs);
 
             if (animation.isInAnimation()) {
                 // make sure that frustum culling updates when running rotation animation
                 MinecraftClient.getInstance().worldRenderer.scheduleTerrainUpdate();
             }
-            matrix4f2.rotate(currentGravityRotation);
+            //matrix4f2.rotate(currentGravityRotation);
         }
-    }*/
+    }
 }

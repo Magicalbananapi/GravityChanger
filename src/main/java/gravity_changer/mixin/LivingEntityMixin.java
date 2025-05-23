@@ -11,10 +11,7 @@ import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,6 +22,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
@@ -473,25 +471,7 @@ public abstract class LivingEntityMixin extends Entity {
         args.set(2, vec3d.y);
         args.set(3, vec3d.z);
     }
-    
-    @ModifyVariable(
-        method = "blockedByShield(Lnet/minecraft/entity/damage/DamageSource;)Z",
-        at = @At(
-            value = "INVOKE_ASSIGN",
-            target = "Lnet/minecraft/entity/LivingEntity;getRotationVector(FF)Lnet/minecraft/util/math/Vec3d;",
-            ordinal = 0
-        ),
-        ordinal = 1
-    )
-    private Vec3d modify_blockedByShield_Vec3d_1(Vec3d vec3d) {
-        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity) (Object) this);
-        if (gravityDirection == Direction.DOWN) {
-            return vec3d;
-        }
-        
-        return RotationUtil.vecWorldToPlayer(vec3d, gravityDirection);
-    }
-    
+
     @ModifyVariable(
             method = "travel(Lnet/minecraft/util/math/Vec3d;)V",
             at = @At(value = "STORE"),
@@ -504,5 +484,85 @@ public abstract class LivingEntityMixin extends Entity {
     @ModifyVariable(method = "computeFallDamage(FF)I", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     private float diminishFallDamage(float value) {
         return value * (float) Math.sqrt(GravityChangerAPI.getGravityStrength(this));
+    }
+
+    @Shadow public abstract void updateLimbs(boolean flutter);
+
+    @Shadow protected abstract void updateLimbs(float limbDistance);
+
+    //TODO: Was removed, might not work
+    @Inject(
+            method = "updateLimbs(Z)V",
+            at = @At("HEAD"),
+            cancellable = true
+    )
+    private void inject_updateLimbs(boolean flutter, CallbackInfo ci) {
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection(this);
+        if(gravityDirection == Direction.DOWN) return;
+
+        ci.cancel();
+
+        Vec3d playerPosDelta = RotationUtil.vecWorldToPlayer(this.getX() - this.prevX, this.getY() - this.prevY, this.getZ() - this.prevZ, gravityDirection);
+
+        float mag = (float) MathHelper.magnitude(playerPosDelta.x,flutter ? playerPosDelta.y : 0.0D,playerPosDelta.z);
+        this.updateLimbs(mag);
+    }
+
+
+    // TODO shield knockback
+    @ModifyVariable(
+            method = "blockedByShield",
+            at = @At(
+                    value = "INVOKE_ASSIGN",
+                    target = "Lnet/minecraft/entity/LivingEntity;getRotationVector(FF)Lnet/minecraft/util/math/Vec3d;",
+                    ordinal = 0
+            ),
+            ordinal = 1
+    )
+    private Vec3d modify_blockedByShield_Vec3d_1(Vec3d vec3d) {
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
+        if(gravityDirection == Direction.DOWN) {
+            return vec3d;
+        }
+
+        return RotationUtil.vecWorldToPlayer(vec3d, gravityDirection);
+    }
+
+    //TODO: Was commented out, might not work
+    @ModifyArg(
+            method = "blockedByShield",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/util/math/Vec3d;relativize(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;",
+                    ordinal = 0
+            ),
+            index = 0
+    )
+    private Vec3d modify_blockedByShield_relativize_0(Vec3d vec3d) {
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
+        if(gravityDirection == Direction.DOWN) {
+            return vec3d;
+        }
+
+        return this.getEyePos();
+    }
+
+    //TODO: Was commented out, might not work
+    @ModifyVariable(
+            method = "blockedByShield",
+            at = @At(
+                    value = "INVOKE_ASSIGN",
+                    target = "Lnet/minecraft/util/math/Vec3d;normalize()Lnet/minecraft/util/math/Vec3d;",
+                    ordinal = 0
+            ),
+            ordinal = 2
+    )
+    private Vec3d modify_blockedByShield_Vec3d_2(Vec3d vec3d) {
+        Direction gravityDirection = GravityChangerAPI.getGravityDirection((Entity)(Object)this);
+        if(gravityDirection == Direction.DOWN) {
+            return vec3d;
+        }
+
+        return RotationUtil.vecWorldToPlayer(vec3d, gravityDirection);
     }
 }
