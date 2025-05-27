@@ -31,7 +31,11 @@ The 1.12+ generation of gravity mods seem to be partially based on code from Mys
 
 As far as I know, most gravity mods past 1.7.10 are attempts to recreate the gravity effect
 from what I consider the original gravity mod, [StarMiner](https://web.archive.org/web/20160215085700/http://forum.minecraftuser.jp/viewtopic.php?f=13&t=17975).
-If there was an earlier gravity mod, please let me know.
+
+However, there was at least one earlier gravity mod for 1.2.5 called [GravityCraft](https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/minecraft-mods/1285013-1-2-5-gravitycraft-mineup-1-1-higher-worlds#History) that may have inspired others as some features seem familiar.
+
+
+If there are missing gravity mods, please let me know.
 
 
 #
