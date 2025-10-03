@@ -41,7 +41,9 @@ If there are missing gravity mods, please let me know.
 #
 
 Maintaining the fork because Immersive Portals mod depends on the Gravity changing mod, 
-and Fabric mod cannot depend on a Quilt mod.
+and Fabric mod cannot depend on a Quilt mod. (For this fork specifically, compatibility does
+not work out of the box, supposedly somebody in the discord has a fix that just requires changing
+the modid [Link to Discord Message](https://discord.com/channels/662271867431682058/1143860421229563934/1386945825233436702), but I have yet to get to this)
 
 This Gravity Changer mod is not identical to Fusion's Gravity API.
 **The two mods cannot be used interchangeably.**
