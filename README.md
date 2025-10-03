@@ -8,7 +8,7 @@ Normally I would have just submitted this as a pull req on the GitHub for qoutea
 fork, but I wanted to use the yarn mapping to port this since I was more used to
 using it and with this version using a different mapping I felt like it made
 more sense as a fork than sending a pull req with literally every single file significantly
-changed.
+changed. (but I also did that anyways)
 
 If anyone wants to convert it back to mojmap+parchment mappings and submit it to
 qouteall's GitHub, feel free, but the mixins will probably be annoying, so they will
